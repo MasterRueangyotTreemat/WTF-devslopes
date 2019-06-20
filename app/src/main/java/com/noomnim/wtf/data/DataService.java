@@ -12,9 +12,11 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
 import com.noomnim.wtf.R;
 import com.noomnim.wtf.activities.FoodTrucksListsActivity;
+import com.noomnim.wtf.activities.ReviewsActivity;
 import com.noomnim.wtf.adapter.FoodTruckAdapter;
 import com.noomnim.wtf.constants.Constants;
 import com.noomnim.wtf.model.FoodTruck;
+import com.noomnim.wtf.model.FoodTruckReview;
 import com.noomnim.wtf.view.ItemDecorator;
 
 import org.json.JSONArray;
@@ -85,6 +87,54 @@ public class DataService {
         Volley.newRequestQueue( context ).add( getTrucks );
         return foodTrucksList;
     }
+
+
+    //Request all the FoodTrucks Reviews
+
+    public ArrayList<FoodTruckReview> downloadReviews(Context context, FoodTruck foodTruck, final ReviewsActivity.ReviewInterface listener){
+        String url = Constants.GET_REVIEWS + foodTruck.getId();
+        final ArrayList<FoodTruckReview> reviewsList = new ArrayList<>(  );
+
+        final JsonArrayRequest getReviews = new JsonArrayRequest( Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                System.out.println( response.toString() );
+                Log.i( "API", "Err " + response.toString() );
+
+                try {
+                    JSONArray reviews = response;
+                    Log.d( "JSON ARRAY", String.valueOf( reviews ) );
+                    for (int x = 0; x < reviews.length(); x++) {
+                        JSONObject review = reviews.getJSONObject( x );
+                        String title = review.getString( "title" );
+                        String id = review.getString( "_id" );
+                        String text = review.getString( "text" );
+
+                        FoodTruckReview newFoodTruckReview = new FoodTruckReview( id, title, text );
+                        reviewsList.add( newFoodTruckReview );
+                        Log.i( "MSG", "JSON " + title );
+
+                    }
+                } catch (JSONException e) {
+                    Log.v( "JSON", "EXC " + e.getLocalizedMessage() );
+                }
+
+//                Log.d( "GET JSON" , "This is the food truck name " + foodTrucksList.get( 1 ).getName() );
+//                System.out.println( "This is the food truck name " + foodTrucksList.get( 1 ).getName() );
+                listener.success( true );
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("API", "Err " + error.getLocalizedMessage());
+            }
+        } );
+
+        Volley.newRequestQueue( context ).add( getReviews );
+        return reviewsList;
+    }
+
 
 
 

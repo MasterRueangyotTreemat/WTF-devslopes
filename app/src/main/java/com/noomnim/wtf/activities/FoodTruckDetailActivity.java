@@ -1,7 +1,10 @@
 package com.noomnim.wtf.activities;
 
+import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -20,6 +23,10 @@ public class FoodTruckDetailActivity extends FragmentActivity implements OnMapRe
     private TextView truckName;
     private TextView foodType;
     private TextView avgCost;
+    public static final  String EXTRA_ITEM_TRUCK = "TRUCK";
+    private Button addReviewBtn;
+    private Button viewReviewBtn;
+    private Button modifyTruckBtn;
 
 
     @Override
@@ -30,6 +37,17 @@ public class FoodTruckDetailActivity extends FragmentActivity implements OnMapRe
         truckName = (TextView) findViewById( R.id.detail_truck_name );
         foodType = (TextView) findViewById( R.id.detail_food_type );
         avgCost = (TextView) findViewById( R.id.detail_food_cost );
+
+        addReviewBtn = (Button) findViewById( R.id.add_reivew_btn );
+        viewReviewBtn = (Button) findViewById( R.id.view_review_btn );
+        modifyTruckBtn = (Button) findViewById( R.id.modify_truck_btn );
+
+        viewReviewBtn.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadReviews( foodTruck );
+            }
+        } );
 
 
 
@@ -66,5 +84,13 @@ public class FoodTruckDetailActivity extends FragmentActivity implements OnMapRe
         mMap.setIndoorEnabled( true );
         mMap.setBuildingsEnabled( true );
         mMap.getUiSettings().setZoomControlsEnabled( true );
+
+
+    }
+
+    public void loadReviews(FoodTruck truck){
+        Intent intent = new Intent( FoodTruckDetailActivity.this, ReviewsActivity.class );
+        intent.putExtra( FoodTruckDetailActivity.EXTRA_ITEM_TRUCK, truck );
+        startActivity( intent );
     }
 }
