@@ -1,5 +1,6 @@
 package com.noomnim.wtf.activities;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,6 +14,7 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
 import com.noomnim.wtf.R;
 import com.noomnim.wtf.adapter.FoodTruckAdapter;
+import com.noomnim.wtf.data.DataService;
 import com.noomnim.wtf.model.FoodTruck;
 import com.noomnim.wtf.view.ItemDecorator;
 
@@ -26,62 +28,59 @@ public class FoodTrucksListsActivity extends AppCompatActivity {
 
     // Variable
     private FoodTruckAdapter adapter;
+    private ArrayList<FoodTruck> trucks = new ArrayList<>(  );
+    private static FoodTrucksListsActivity foodTrucksListsActivity;
+    public static final  String EXTRA_ITEM_TRUCK = "TRUCK";
+
+    public static FoodTrucksListsActivity getFoodTrucksListsActivity() {
+        return foodTrucksListsActivity;
+    }
+
+    public static void setFoodTrucksListsActivity(FoodTrucksListsActivity foodTrucksListsActivity) {
+        FoodTrucksListsActivity.foodTrucksListsActivity = foodTrucksListsActivity;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_food_trucks_lists );
 
-        String url = "http://10.0.2.2:3005/api/v1/foodtruck";
-        final ArrayList<FoodTruck> foodTrucksList = new ArrayList<>(  );
+        foodTrucksListsActivity.setFoodTrucksListsActivity(this);
 
-        final JsonArrayRequest getTrucks = new JsonArrayRequest( Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+        TrucksDownloaded listener = new TrucksDownloaded() {
             @Override
-            public void onResponse(JSONArray response) {
-                System.out.println( response.toString() );
-                Log.i("API", "Err " + response.toString(  ));
-
-                try{
-                    JSONArray foodTrucks = response;
-                    Log.d( "JSON ARRAY" , String.valueOf( foodTrucks ) );
-                    for(int x = 0; x < foodTrucks.length(); x++){
-                        JSONObject foodTruck = foodTrucks.getJSONObject( x );
-                        String name = foodTruck.getString( "name" );
-                        String id = foodTruck.getString( "_id" );
-                        String foodType = foodTruck.getString( "foodtype" );
-                        Double avgcost = foodTruck.getDouble( "avgcost" );
-
-                        JSONObject geometry = foodTruck.getJSONObject( "geometry" );
-                        JSONObject coordinates = geometry.getJSONObject( "coordinates" );
-                        Double latitude = coordinates.getDouble( "lat" );
-                        Double longtitude = coordinates.getDouble( "long" );
-
-                        FoodTruck newFoodTruck = new FoodTruck( id,name,foodType,avgcost,latitude,longtitude );
-                        foodTrucksList.add( newFoodTruck );
-                        Log.i("MSG","JSON " + name);
-
-                    }
-                }catch (JSONException e){
-                    Log.v("JSON","EXC " + e.getLocalizedMessage());
+            public void success(Boolean succes) {
+                if(succes){
+                    setUpRecycler();
                 }
-
-//                Log.d( "GET JSON" , "This is the food truck name " + foodTrucksList.get( 1 ).getName() );
-//                System.out.println( "This is the food truck name " + foodTrucksList.get( 1 ).getName() );
-                RecyclerView recyclerView = (RecyclerView) findViewById( R.id.recycler_foodtruck );
-                recyclerView.setHasFixedSize( true );
-                adapter = new FoodTruckAdapter( foodTrucksList );
-                recyclerView.setAdapter( adapter );
-                LinearLayoutManager layoutManager = new LinearLayoutManager( getBaseContext() );
-                layoutManager.setOrientation( LinearLayoutManager.VERTICAL );
-                recyclerView.setLayoutManager( layoutManager );
-                recyclerView.addItemDecoration( new ItemDecorator( 0,0,0,10 ) );
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("API", "Err " + error.getLocalizedMessage());
-            }
-        } );
+        };
 
-        Volley.newRequestQueue( this ).add( getTrucks );
+        setUpRecycler();
+        trucks = DataService.getInstance().downloadAllFoodTrucks( this, listener );
+
+    }
+
+    private void setUpRecycler(){
+        RecyclerView recyclerView = (RecyclerView) findViewById( R.id.recycler_foodtruck );
+        recyclerView.setHasFixedSize( true );
+        adapter = new FoodTruckAdapter( trucks );
+        recyclerView.setAdapter( adapter );
+        LinearLayoutManager layoutManager = new LinearLayoutManager( getBaseContext() );
+        layoutManager.setOrientation( LinearLayoutManager.VERTICAL );
+        recyclerView.setLayoutManager( layoutManager );
+        recyclerView.addItemDecoration( new ItemDecorator( 0,0,0,10 ) );
+
+    }
+
+
+    public interface TrucksDownloaded {
+        void success(Boolean succes);
+    }
+
+    public void loadFoodTruckDetailActivity(FoodTruck truck){
+        Intent intent = new Intent( FoodTrucksListsActivity.this, FoodTruckDetailActivity.class );
+        intent.putExtra( FoodTrucksListsActivity.EXTRA_ITEM_TRUCK, truck );
+        startActivity( intent );
     }
 }

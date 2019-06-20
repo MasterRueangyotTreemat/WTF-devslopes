@@ -1,6 +1,9 @@
 package com.noomnim.wtf.model;
 
-public class FoodTruck {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class FoodTruck implements Parcelable {
     private String id = "";
     private String name = "";
     private String foodtype = "";
@@ -40,4 +43,42 @@ public class FoodTruck {
         this.latitude = latitude;
         this.longtitude = longtitude;
     }
+
+    private FoodTruck(Parcel in){
+        id = in.readString();
+        name = in.readString();
+        foodtype = in.readString();
+        avgcost = in.readDouble();
+        latitude = in.readDouble();
+        longtitude = in.readDouble();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString( id );
+        dest.writeString( name );
+        dest.writeString( foodtype );
+        dest.writeDouble( avgcost );
+        dest.writeDouble( latitude );
+        dest.writeDouble( longtitude );
+    }
+
+    public static final  Parcelable.Creator<FoodTruck> CREATOR = new Creator<FoodTruck>() {
+        @Override
+        public FoodTruck createFromParcel(Parcel source) {
+            return new FoodTruck( source );
+        }
+
+        @Override
+        public FoodTruck[] newArray(int size) {
+            return new FoodTruck[size];
+        }
+    };
+
+
 }

@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.noomnim.wtf.R;
+import com.noomnim.wtf.activities.FoodTrucksListsActivity;
 import com.noomnim.wtf.holder.FoodTruckHolder;
 import com.noomnim.wtf.model.FoodTruck;
 
@@ -32,6 +33,12 @@ public class FoodTruckAdapter extends RecyclerView.Adapter<FoodTruckHolder> {
         final  FoodTruck truck = trucks.get( i );
         foodTruckHolder.updateUI( truck );
 
+        foodTruckHolder.itemView.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FoodTrucksListsActivity.getFoodTrucksListsActivity().loadFoodTruckDetailActivity(truck);
+            }
+        } );
     }
 
     @Override
