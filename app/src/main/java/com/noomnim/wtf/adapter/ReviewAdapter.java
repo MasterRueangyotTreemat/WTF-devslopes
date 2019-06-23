@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.noomnim.wtf.R;
+import com.noomnim.wtf.holder.FoodTruckHolder;
 import com.noomnim.wtf.holder.ReviewHolder;
 import com.noomnim.wtf.model.FoodTruckReview;
 
@@ -23,7 +24,8 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewHolder> {
     @NonNull
     @Override
     public ReviewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        View reviewCard = LayoutInflater.from( viewGroup.getContext() ).inflate( R.layout.card_review, viewGroup, false );
+
+        View reviewCard = LayoutInflater.from( viewGroup.getContext() ).inflate( R.layout.card_view, viewGroup, false );
         return new ReviewHolder( reviewCard );
     }
 

@@ -2,6 +2,7 @@ package com.noomnim.wtf.adapter;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,10 +40,14 @@ public class FoodTruckAdapter extends RecyclerView.Adapter<FoodTruckHolder> {
                 FoodTrucksListsActivity.getFoodTrucksListsActivity().loadFoodTruckDetailActivity(truck);
             }
         } );
+        Log.d("Size", "Get Size " + trucks.size());
+
     }
 
     @Override
     public int getItemCount() {
         return trucks.size();
+
     }
+
 }

@@ -1,11 +1,14 @@
 package com.noomnim.wtf.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -14,6 +17,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.noomnim.wtf.R;
+import com.noomnim.wtf.constants.Constants;
 import com.noomnim.wtf.model.FoodTruck;
 
 public class FoodTruckDetailActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -27,7 +31,7 @@ public class FoodTruckDetailActivity extends FragmentActivity implements OnMapRe
     private Button addReviewBtn;
     private Button viewReviewBtn;
     private Button modifyTruckBtn;
-
+    SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +42,7 @@ public class FoodTruckDetailActivity extends FragmentActivity implements OnMapRe
         foodType = (TextView) findViewById( R.id.detail_food_type );
         avgCost = (TextView) findViewById( R.id.detail_food_cost );
 
-        addReviewBtn = (Button) findViewById( R.id.add_reivew_btn );
+        addReviewBtn = (Button) findViewById( R.id.add_review_btn );
         viewReviewBtn = (Button) findViewById( R.id.view_review_btn );
         modifyTruckBtn = (Button) findViewById( R.id.modify_truck_btn );
 
@@ -49,10 +53,20 @@ public class FoodTruckDetailActivity extends FragmentActivity implements OnMapRe
             }
         } );
 
+        addReviewBtn.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadAddReview();
+            }
+        } );
+
 
 
         foodTruck = getIntent().getParcelableExtra( FoodTrucksListsActivity.EXTRA_ITEM_TRUCK );
         //System.out.println( foodTruck.getName() );
+
+        prefs = PreferenceManager.getDefaultSharedPreferences( this );
+
         updateUI();
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -92,5 +106,20 @@ public class FoodTruckDetailActivity extends FragmentActivity implements OnMapRe
         Intent intent = new Intent( FoodTruckDetailActivity.this, ReviewsActivity.class );
         intent.putExtra( FoodTruckDetailActivity.EXTRA_ITEM_TRUCK, truck );
         startActivity( intent );
+    }
+
+    public void loadAddReview(){
+        if(prefs.getBoolean( Constants.IS_LOGGED_IN, false )) {
+            Intent intent = new Intent( FoodTruckDetailActivity.this, AddReviewActivity.class );
+            intent.putExtra( FoodTruckDetailActivity.EXTRA_ITEM_TRUCK, foodTruck );
+            startActivity( intent );
+        }else{
+            Intent intent = new Intent( FoodTruckDetailActivity.this, LoginActivity.class );
+            Toast.makeText( getBaseContext(),"Please login to leave a review ", Toast.LENGTH_SHORT ).show();
+            startActivity( intent );
+
+        }
+
+
     }
 }

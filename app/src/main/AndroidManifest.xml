@@ -17,9 +17,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <activity android:name=".activities.AddTruckActivity"></activity>
+        <activity android:name=".activities.AddReviewActivity" />
         <activity
-            android:name=".ui.login.LoginActivity"
-            android:label="@string/title_activity_login"></activity>
+            android:name=".activities.ui.login.LoginActivity"
+            android:label="@string/title_activity_login" />
         <activity android:name=".activities.ReviewsActivity" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -44,6 +46,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".activities.LoginActivity" />
     </application>
 
 </manifest>
